@@ -1,0 +1,10 @@
+.env
+/allure-results
+__pycache__/
+*.py[cod]
+.idea/
+*.pyc
+*.pyo
+*.pyd
+*.log
+.cache/
