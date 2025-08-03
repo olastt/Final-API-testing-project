@@ -24,8 +24,14 @@ cp .env.example .env
 ```bash
 API_URL=http://your-api.com
 API_NAME=your_api_name
-TOKEN=your_token
+TOKEN= (оставить пустым)
 ```
+
+ Установите необходимые зависимости:
+```bash
+pip install -r requirements.txt
+```
+
 Запустите автотесты:
 ```bash
 pytest --alluredir=./allure-results
