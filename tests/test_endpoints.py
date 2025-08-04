@@ -5,6 +5,7 @@ from Endpoints.auth_token import AuthToken
 from Endpoints.create_meme import CreateMeme
 from Endpoints.get_meme import GetMeme
 from TEST_DATA import CREATE_MEME, NEGATIVE_MEME
+from conftest import get_meme_endpoint
 
 
 class TestMemeMethods:
@@ -30,6 +31,7 @@ class TestMemeMethods:
         client.token = auth_token
         client.authorize(token_type=token_type)
         client.check_status_code(expected_status)
+        client.assert_text_in_response()
 
     @allure.title("Получение всех мемов")
     @allure.epic("Получение мемов")
@@ -68,6 +70,13 @@ class TestMemeMethods:
         }
         get_meme_endpoint.get_meme_by_id(meme_id=test_meme_id, token=tokens[token_type])
         get_meme_endpoint.check_status_code(expected_status)
+        get_meme_endpoint.assert_id_in_meme(expected_meme_id=test_meme_id)
+
+    @allure.feature("Получение несуществующего мема")
+    @allure.suite("Получение несуществующего мема")
+    def test_get_meme_with_nonexistent_id(self, get_meme_endpoint, auth_token):
+        get_meme_endpoint.get_meme_with_nonexistent_id(token=auth_token)
+        get_meme_endpoint.check_status_code(404)
 
     @allure.title("Создание нового мема")
     @allure.epic("Создание мема")
@@ -80,6 +89,8 @@ class TestMemeMethods:
     def test_create_new_meme(self, create_meme_endpoint, auth_token, data, expected_status):
         create_meme_endpoint.create_meme(token=auth_token, data=data)
         create_meme_endpoint.check_status_code(expected_status)
+        create_meme_endpoint.test_response_body()
+        create_meme_endpoint.check_create_meme_with_invalid_body()
 
     @allure.title("Изменение мема")
     @allure.epic("Изменение мема")

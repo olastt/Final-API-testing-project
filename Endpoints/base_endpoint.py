@@ -88,15 +88,3 @@ class Endpoint:
             f"Ожидался статус-код {expected_status_code},"
             f"но получен {self.response.status_code}. Ответ: {self.response.text}"
         )
-
-    @allure.step("Проверка наличия токена в теле ответа")
-    def check_token_in_body(self):
-        response_data = self.response.json()
-        assert "token" in response_data, "В теле отсутствует поле токена"
-
-    @allure.step("Проверка статус кода 200")
-    def check_status_code_200(self):
-        assert self.response is not None, "response == None. Сначала выполните send_request(...)"
-        assert self.response.status_code == 200, (
-            f"Ожидался статус-код 200, но получен {self.response.status_code}. Ответ: {self.response.text}"
-        )

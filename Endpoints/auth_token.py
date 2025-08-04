@@ -99,6 +99,20 @@ class AuthToken(Endpoint):
         assert self.response.status_code == expected_status, \
             f"Ожидался статус {expected_status}, получен {self.response.status_code}"
 
+    @allure.step("Проверка текста в теле ответа")
+    def assert_text_in_response(self):
+        """Проверяет наличие токена в теле ответа"""
+        if self.response.status_code == 200:
+            actual_text = self.response.text.strip()
+            expected_text = "Token is alive. Username is"
+            assert expected_text in actual_text, (
+                f"Ожидалось, что в ответе будет: '{expected_text}', "
+                f"но получено: '{actual_text}'"
+            )
+        else:
+            print(f"Пропущена проверка текста: статус-код {self.response.status_code}")
+        self.log_response()
+
     @allure.step("Генерация невалидного токена")
     def generate_invalid_token(self):
         """Генерирует случайный невалидный токен"""
