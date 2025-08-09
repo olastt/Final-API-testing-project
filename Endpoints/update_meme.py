@@ -15,33 +15,34 @@ class UpdateMeme(Endpoint):
         self.headers = {"Content-Type": "application/json"}
         self.updated_data = None
 
-    @allure.step("Изменение мема")
+    @allure.step("Обновление мема по ID")
     def update_meme(self, meme_id, token=None):
-        self.updated_data = {
-            "id": int(meme_id),
-            "text": "update",
-            "url": "update",
-            "tags": ["one", "update"],
-            "info": {"colors": ["update", "black", "white"]}
-        }
-        self.send_request(method="PUT", endpoint="meme", meme_id=meme_id, token=token, data=self.updated_data)
-        self.log_response()
+        with allure.step("Формирование данных для обновления"):
+            self.updated_data = {
+                "id": int(meme_id),
+                "text": "update",
+                "url": "update",
+                "tags": ["one", "update"],
+                "info": {"colors": ["update", "black", "white"]}
+            }
 
-    @allure.step("Проверка мема после обновления")
+        with allure.step("Отправка PUT-запроса на обновление мема"):
+            self.send_request(method="PUT", endpoint="meme", meme_id=meme_id, token=token, data=self.updated_data)
+            self.log_response()
+
+    @allure.step("Проверка данных мема после обновления")
     def check_updated_data(self, meme_id, expected_data=None, token=None):
-        # Используем переданный токен, если он есть, иначе берем self.token
         token_to_use = token or self.token
 
-        # Получаем текущие данные мема с актуальным токеном
-        self.send_request(method="GET", endpoint=f"/meme/{meme_id}", token=token_to_use)
-        self.log_response()
-        response_data = self.response.json()
-
-        response_data["id"] = int(response_data["id"])
+        with allure.step("Получение актуальных данных мема"):
+            self.send_request(method="GET", endpoint=f"/meme/{meme_id}", token=token_to_use)
+            self.log_response()
+            response_data = self.response.json()
+            response_data["id"] = int(response_data["id"])
 
         data_check = expected_data or self.updated_data
 
-        with allure.step("Сравнение всех полей после обновления"):
+        with allure.step("Сравнение фактических и ожидаемых данных"):
             allure.attach(
                 json.dumps(response_data, indent=2, ensure_ascii=False),
                 name="Фактические данные",
@@ -54,5 +55,8 @@ class UpdateMeme(Endpoint):
             )
 
             for key in data_check.keys():
-                assert key in response_data, f"Поле '{key}' отсутствует в полученных данных."
-                assert response_data[key] == data_check[key], f"Значение поля '{key}' отличается от ожидаемого."
+                with allure.step(f"Проверка поля '{key}'"):
+                    assert key in response_data, f"Поле '{key}' отсутствует в полученных данных."
+                    assert response_data[key] == data_check[key], (
+                        f"Значение поля '{key}' отличается: ожидалось {data_check[key]}, получено {response_data[key]}"
+                    )

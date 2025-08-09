@@ -1,4 +1,4 @@
-CREATE_MEME = {
+VALID_MEME = {
     "text": "string1",
     "url": "string2",
     "tags": ["one", "two"],
